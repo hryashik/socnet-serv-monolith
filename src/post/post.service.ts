@@ -1,19 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { createPostDto } from './dto/create-post.dto';
+import { CreatePostDto } from './dto/create-post.dto';
 
 @Injectable()
 export class PostService {
   constructor(private readonly prisma: PrismaService) {}
 
-  createPost(dto: createPostDto) {
+  async createPost(dto: CreatePostDto) {
     try {
-      this.prisma.post.create({
+      const post = await this.prisma.post.create({
         data: {
-          ...dto,
+          text: dto.text,
+          userId: 222,
+        },
+        select: {
+          id: true,
+          isModified: true,
+          createdAt: true,
+          updatedAt: true,
+          text: true,
         },
       });
+      return post;
     } catch (error) {
+      if (error.code === 'P2003') throw new ForbiddenException('Incorrect credentials');
       throw new Error(error)
     }
   }

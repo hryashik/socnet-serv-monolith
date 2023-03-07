@@ -59,8 +59,9 @@ export class AuthService {
       select: {
         avatar: true,
         email: true,
-        Post: true
-      }
+        Post: true,
+        id: true,
+      },
     });
   }
   private hashPassword(password: string): Promise<string> {
@@ -79,6 +80,6 @@ export class AuthService {
     const parseToken = token.split('Bearer ')[1];
     // @ts-ignore
     const { email } = this.jwtService.decode(parseToken);
-    return email
+    return email;
   }
 }

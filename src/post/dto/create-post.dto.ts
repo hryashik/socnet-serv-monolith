@@ -1,11 +1,8 @@
 import { IsNotEmpty, IsNumber, IsString } from 'class-validator';
+import { CreatePostBody } from './create-post-body';
 
-export class createPostDto {
+export class CreatePostDto extends  CreatePostBody{
    @IsNotEmpty()
    @IsNumber()
    userId: number;
-
-   @IsNotEmpty()
-   @IsString()
-   text: string;
 }

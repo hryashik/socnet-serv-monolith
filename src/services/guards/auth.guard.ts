@@ -19,6 +19,7 @@ export class AuthGuard implements CanActivate {
     const tokenInfo = this.authService.decodeToken(request.headers.authorization)
     const userInfo = await this.authService.getUserByEmail(tokenInfo)
     if (!tokenInfo || !userInfo) throw new UnauthorizedException()
+
     request.user = userInfo
     return true
   }

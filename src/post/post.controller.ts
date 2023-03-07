@@ -1,6 +1,8 @@
-import { Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Req, ValidationPipe } from '@nestjs/common';
+import { IAuthorizedRequest } from 'src/auth/interfaces/authorized-request.interface';
 import { Authorization } from 'src/services/decorators/auth.decorator';
-import { createPostDto } from './dto/create-post.dto';
+import { CreatePostBody } from './dto/create-post-body';
+import { CreatePostDto } from './dto/create-post.dto';
 import { PostService } from './post.service';
 
 @Controller('post')
@@ -9,7 +11,14 @@ export class PostController {
 
   @Authorization(true)
   @Post()
-  createPost(dto: createPostDto) {
+  createPost(
+    @Body() {text}: CreatePostBody,
+    @Req() request: IAuthorizedRequest
+    ) {
+    const dto: CreatePostDto = {
+      text,
+      userId: request.user.id
+    }
     return this.postService.createPost(dto);
   }
 }
