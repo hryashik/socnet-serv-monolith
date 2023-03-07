@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsNumber } from "class-validator";
 
-export class getAllPostsByIdDto {
+export class GetAllPostsByIdDto {
   @IsNotEmpty()
   @IsNumber()
   userId: number
