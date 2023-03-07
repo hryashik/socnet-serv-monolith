@@ -1,9 +1,9 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { SignUpDto } from './dto/signup.dto';
+import { SignUpDto } from './interfaces/dto/signup.dto';
 import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
-import { LoginDto } from './dto/login.dto';
+import { LoginDto } from './interfaces/dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -39,21 +39,30 @@ export class AuthService {
     try {
       const user = await this.prismaService.user.findUnique({
         where: {
-          email: dto.email
-        }
-      })
-      const verifiedPassword = argon.verify(user.hash, dto.password)
+          email: dto.email,
+        },
+      });
+      const verifiedPassword = argon.verify(user.hash, dto.password);
       if (!user || !verifiedPassword) {
-        throw new Error()
+        throw new Error();
       }
-      return this.signToken(user.email)
-
+      return this.signToken(user.email);
     } catch (error) {
-      throw new ForbiddenException('Incorrect credentials')
+      throw new ForbiddenException('incorrect credentials');
     }
   }
-
-
+  getUserByEmail(email: string) {
+    return this.prismaService.user.findUnique({
+      where: {
+        email,
+      },
+      select: {
+        avatar: true,
+        email: true,
+        Post: true
+      }
+    });
+  }
   private hashPassword(password: string): Promise<string> {
     const hash = argon.hash(password, {
       saltLength: 8,
@@ -66,7 +75,10 @@ export class AuthService {
       access_token: token,
     };
   }
-  private decodeToken(token: string) {
-    return this.jwtService.decode(token)
+  public decodeToken(token: string) {
+    const parseToken = token.split('Bearer ')[1];
+    // @ts-ignore
+    const { email } = this.jwtService.decode(parseToken);
+    return email
   }
 }

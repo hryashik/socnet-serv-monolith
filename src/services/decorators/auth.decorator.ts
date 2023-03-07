@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
 
-export const Authorization = (secured: boolean) => {
-  SetMetadata('secured', secured);
+export function Authorization(secured: boolean) {
+ return SetMetadata('secured', secured);
 };
