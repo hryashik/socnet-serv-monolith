@@ -7,21 +7,25 @@ import {
   HttpStatus,
   Param,
   ParseIntPipe,
+  Patch,
   Post,
   Req,
   ValidationPipe,
 } from '@nestjs/common';
 import { IAuthorizedRequest } from 'src/auth/interfaces/authorized-request.interface';
+import { GatewayProvider } from 'src/gateway/gateway.provider';
 import { Authorization } from 'src/services/decorators/auth.decorator';
 import { CreatePostBody } from './dto/create-post-body';
 import { CreatePostDto } from './dto/create-post.dto';
 import { DeletePostById } from './dto/delete-post-byid.dto';
+import { EditPostBody } from './dto/edit-post-body';
+import { EditPostByIdDto } from './dto/edit-post-byid.dto';
 import { GetAllPostsByIdDto } from './dto/get-all-posts-byid.dto';
 import { PostService } from './post.service';
 
 @Controller('post')
 export class PostController {
-  constructor(private readonly postService: PostService) {}
+  constructor(private readonly postService: PostService, private readonly gateway: GatewayProvider) {}
 
   @Authorization(true)
   @Post()
@@ -57,5 +61,25 @@ export class PostController {
       userId: request.user.id,
     };
     return this.postService.deletePostById(dto);
+  }
+
+  @Authorization(true)
+  @Patch(':id')
+  EditPostById(
+    @Body() { text }: EditPostBody,
+    @Param('id', ParseIntPipe) id: number,
+    @Req() req: IAuthorizedRequest,
+  ) {
+    const dto: EditPostByIdDto = {
+      text,
+      id,
+      userId: req.user.id,
+    };
+    return this.postService.editPostById(dto);
+  }
+
+  @Get('check')
+  check() {
+    this.gateway.sendMessage('123456')
   }
 }

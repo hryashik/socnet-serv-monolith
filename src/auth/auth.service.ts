@@ -52,17 +52,21 @@ export class AuthService {
     }
   }
   getUserByEmail(email: string) {
-    return this.prismaService.user.findUnique({
-      where: {
-        email,
-      },
-      select: {
-        avatar: true,
-        email: true,
-        Post: true,
-        id: true,
-      },
-    });
+    try {
+      return this.prismaService.user.findUnique({
+        where: {
+          email,
+        },
+        select: {
+          avatar: true,
+          email: true,
+          Post: true,
+          id: true,
+        },
+      });
+    } catch (error) {
+      throw new ForbiddenException(error)
+    }
   }
   private hashPassword(password: string): Promise<string> {
     const hash = argon.hash(password, {

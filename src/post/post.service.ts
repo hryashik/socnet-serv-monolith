@@ -2,6 +2,7 @@ import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { DeletePostById } from './dto/delete-post-byid.dto';
+import { EditPostByIdDto } from './dto/edit-post-byid.dto';
 import { GetAllPostsByIdDto } from './dto/get-all-posts-byid.dto';
 
 @Injectable()
@@ -64,10 +65,37 @@ export class PostService {
           },
         });
       } else {
-        throw new Error('Incorrect id or userId')
+        throw new Error('Incorrect id or userId');
       }
     } catch (error) {
       throw new ForbiddenException(error.message);
+    }
+  }
+
+  async editPostById(dto: EditPostByIdDto) {
+    try {
+      const posts = await this.prisma.post.findMany({
+        where: {
+          userId: dto.userId,
+        },
+      });
+      if (posts.find(el => el.id === dto.id)) {
+        const post = await this.prisma.post.update({
+          where: {
+            id: dto.id,
+          },
+          data: {
+            ...dto,
+            isModified: true
+          },
+        });
+        return post;
+      } else {
+        throw new ForbiddenException('Incorrect credentials')
+      }
+    } catch (error) {
+      if (error.status === 403) throw new ForbiddenException(error.message)
+      throw new Error()
     }
   }
 }

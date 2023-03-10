@@ -4,9 +4,11 @@ import { PrismaModule } from './prisma/prisma.module';
 import { PostModule } from './post/post.module';
 import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './services/guards/auth.guard';
+import { GatewayModule } from './gateway/gateway.module';
+import { DialogModule } from './dialog/dialog.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule, PostModule],
+  imports: [AuthModule, PrismaModule, PostModule, GatewayModule, DialogModule],
   providers: [
     {
       provide: APP_GUARD,
