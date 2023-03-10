@@ -6,9 +6,10 @@ import { APP_GUARD } from '@nestjs/core';
 import { AuthGuard } from './services/guards/auth.guard';
 import { GatewayModule } from './gateway/gateway.module';
 import { DialogModule } from './dialog/dialog.module';
+import { MessageModule } from './message/message.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule, PostModule, GatewayModule, DialogModule],
+  imports: [AuthModule, PrismaModule, PostModule, GatewayModule, DialogModule, MessageModule],
   providers: [
     {
       provide: APP_GUARD,

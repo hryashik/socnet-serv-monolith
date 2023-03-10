@@ -34,7 +34,7 @@ model Post {
 }
 
 model Dialog {
-  id      String    @id @default(uuid())
+  id      Int   @id @default(autoincrement())
   usersId Int[]
   users   User[]
   Message Message[]
@@ -45,7 +45,7 @@ model Message {
   authorId  Int
   author    User     @relation(fields: [authorId], references: [id])
   text      String
-  dialogId  String
+  dialogId  Int
   dialog    Dialog   @relation(fields: [dialogId], references: [id])
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
