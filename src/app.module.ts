@@ -7,7 +7,7 @@ import { AuthGuard } from './services/guards/auth.guard';
 import { GatewayModule } from './gateway/gateway.module';
 import { DialogModule } from './dialog/dialog.module';
 import { MessageModule } from './message/message.module';
-import { UsersModule } from './users/users.module';
+import { UsersRepositoryModule } from './repositories/usersRepository/usersRepository.module';
 
 @Module({
   imports: [
@@ -17,7 +17,7 @@ import { UsersModule } from './users/users.module';
     GatewayModule,
     DialogModule,
     MessageModule,
-    UsersModule,
+    UsersRepositoryModule
   ],
   providers: [
     {

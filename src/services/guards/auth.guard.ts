@@ -1,13 +1,14 @@
 import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { Request } from 'express';
 import { AuthService } from 'src/auth/auth.service';
+import { UsersRepositoryService } from 'src/repositories/usersRepository/usersRepository.service';
 
 @Injectable()
 export class AuthGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
-    private readonly authService: AuthService
+    private readonly authService: AuthService,
+    private readonly userRepository: UsersRepositoryService
   ) {}
   public async canActivate(context: ExecutionContext): Promise<boolean> {
     const secured = this.reflector.get('secured', context.getHandler());
@@ -17,7 +18,7 @@ export class AuthGuard implements CanActivate {
     const response = context.switchToHttp().getResponse()
     
     const tokenInfo = this.authService.decodeToken(request.headers.authorization)
-    const userInfo = await this.authService.getUserByEmail(tokenInfo)
+    const userInfo = await this.userRepository.findByEmail(tokenInfo)
     if (!tokenInfo || !userInfo) throw new UnauthorizedException()
 
     request.user = userInfo

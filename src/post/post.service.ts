@@ -1,5 +1,5 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
-import { PrismaService } from 'src/prisma/prisma.service';
+import { PostsRepositoryService } from 'src/repositories/postsRepository/postsRepository.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { DeletePostById } from './dto/delete-post-byid.dto';
 import { EditPostByIdDto } from './dto/edit-post-byid.dto';
@@ -7,23 +7,13 @@ import { GetAllPostsByIdDto } from './dto/get-all-posts-byid.dto';
 
 @Injectable()
 export class PostService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly postsRepository: PostsRepositoryService,
+  ) {}
 
   async createPost(dto: CreatePostDto) {
     try {
-      const post = await this.prisma.post.create({
-        data: {
-          text: dto.text,
-          userId: dto.userId,
-        },
-        select: {
-          id: true,
-          isModified: true,
-          createdAt: true,
-          updatedAt: true,
-          text: true,
-        },
-      });
+      const post = await this.postsRepository.create(dto.userId, dto.text);
       return post;
     } catch (error) {
       if (error.code === 'P2003')
@@ -34,18 +24,7 @@ export class PostService {
 
   async getAllPostsById(dto: GetAllPostsByIdDto) {
     try {
-      return await this.prisma.post.findMany({
-        where: {
-          userId: dto.userId,
-        },
-        select: {
-          id: true,
-          isModified: true,
-          createdAt: true,
-          updatedAt: true,
-          text: true,
-        },
-      });
+      return await this.postsRepository.findManyById(dto.userId);
     } catch (error) {
       throw new Error(error);
     }
@@ -53,17 +32,9 @@ export class PostService {
 
   async deletePostById(dto: DeletePostById) {
     try {
-      const posts = await this.prisma.post.findMany({
-        where: {
-          userId: dto.userId,
-        },
-      });
-      if (posts.find(el => el.id === dto.id)) {
-        await this.prisma.post.delete({
-          where: {
-            id: dto.id,
-          },
-        });
+      const posts = await this.postsRepository.findManyById(dto.userId);
+      if (posts.length && posts.find(el => el.id === dto.id)) {
+        await this.postsRepository.deleteById(dto.id);
       } else {
         throw new Error('Incorrect id or userId');
       }
@@ -74,28 +45,16 @@ export class PostService {
 
   async editPostById(dto: EditPostByIdDto) {
     try {
-      const posts = await this.prisma.post.findMany({
-        where: {
-          userId: dto.userId,
-        },
-      });
-      if (posts.find(el => el.id === dto.id)) {
-        const post = await this.prisma.post.update({
-          where: {
-            id: dto.id,
-          },
-          data: {
-            ...dto,
-            isModified: true
-          },
-        });
+      const userPosts = await this.postsRepository.findManyById(dto.userId);
+      if (userPosts.length && userPosts.find(el => el.id === dto.id)) {
+        const post = await this.postsRepository.updateById(dto.id, dto.text)
         return post;
       } else {
-        throw new ForbiddenException('Incorrect credentials')
+        throw new ForbiddenException('Incorrect credentials');
       }
     } catch (error) {
-      if (error.status === 403) throw new ForbiddenException(error.message)
-      throw new Error()
+      if (error.status === 403) throw new ForbiddenException(error.message);
+      throw new Error();
     }
   }
 }
