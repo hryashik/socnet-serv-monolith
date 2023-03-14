@@ -19,12 +19,16 @@ import { CreateMessageDto } from 'src/message/dto/create-message.dto';
 import { MessageService } from 'src/message/message.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 
+enum EventType {
+  NEW_MESSAGE = "newMessage"
+}
+
 @WebSocketGateway()
 export class GatewayProvider implements OnModuleInit {
   constructor(
     private readonly dialogService: DialogService,
     private readonly prisma: PrismaService,
-    private readonly messageService: MessageService
+    private readonly messageService: MessageService,
   ) {}
   @WebSocketServer()
   server: Server;
@@ -53,7 +57,7 @@ export class GatewayProvider implements OnModuleInit {
     @ConnectedSocket() client: Socket,
   ) {
     const dialog = await this.dialogService.createDialog(body);
-    client.emit('newMessage', dialog)
+    client.emit('newMessage', dialog);
   }
 
   @UseFilters(WsExceptionFilter)
@@ -61,14 +65,13 @@ export class GatewayProvider implements OnModuleInit {
   @SubscribeMessage('create-message')
   async createMessage(
     @MessageBody() body: CreateMessageDto,
-    @ConnectedSocket() client: Socket
+    @ConnectedSocket() client: Socket,
   ) {
-    await this.messageService.createMessage(body)
-    const messages = await this.prisma.message.findMany({
-      where: {
-        authorId: 1
-      }
-    })
-    console.log(messages)
+    await this.messageService.createMessage(body);
+    this.server.to(body.dialogId.toString()).emit('newMessage', body);
+  }
+
+  notification(usersArray: number[], event: EventType) {
+    
   }
 }

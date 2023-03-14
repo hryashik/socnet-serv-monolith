@@ -28,13 +28,13 @@ model Post {
   isModified Boolean  @default(false)
   text       String
   userId     Int
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("posts")
 }
 
 model Dialog {
-  id      Int   @id @default(autoincrement())
+  id      Int       @id @default(autoincrement())
   usersId Int[]
   users   User[]
   Message Message[]

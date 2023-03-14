@@ -82,6 +82,7 @@ export class AuthService {
   }
   public decodeToken(token: string) {
     const parseToken = token.split('Bearer ')[1];
+    /* console.log(this.jwtService.verify(token)) */
     // @ts-ignore
     const { email } = this.jwtService.decode(parseToken);
     return email;

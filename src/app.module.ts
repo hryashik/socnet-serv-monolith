@@ -7,14 +7,23 @@ import { AuthGuard } from './services/guards/auth.guard';
 import { GatewayModule } from './gateway/gateway.module';
 import { DialogModule } from './dialog/dialog.module';
 import { MessageModule } from './message/message.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
-  imports: [AuthModule, PrismaModule, PostModule, GatewayModule, DialogModule, MessageModule],
+  imports: [
+    AuthModule,
+    PrismaModule,
+    PostModule,
+    GatewayModule,
+    DialogModule,
+    MessageModule,
+    UsersModule,
+  ],
   providers: [
     {
       provide: APP_GUARD,
-      useClass: AuthGuard
-    }
-  ]
+      useClass: AuthGuard,
+    },
+  ],
 })
 export class AppModule {}
