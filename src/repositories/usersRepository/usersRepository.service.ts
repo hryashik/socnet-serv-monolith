@@ -16,15 +16,22 @@ export class UsersRepositoryService {
         email: true,
         createdAt: true,
         updatedAt: true,
-        id: true
+        id: true,
       },
     });
   }
 
-  findByEmail(email: string): Promise<User | undefined> {
+  async findByEmail(email: string): Promise<User | undefined> {
     return this.prisma.user.findUnique({
       where: {
-        email
+        email,
+      },
+    });
+  }
+  async findById(id: number) {
+    return this.prisma.user.findUnique({
+      where: {
+        id
       }
     })
   }

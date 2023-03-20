@@ -5,12 +5,19 @@ import { CreateDialogDto } from './dto/create-dialog.dto';
 @Injectable()
 export class DialogService {
   constructor(private readonly prisma: PrismaService) {}
-  createDialog(dto: CreateDialogDto) {
+  createDialog(usersId: number[]) {
     const dialog = this.prisma.dialog.create({
       data: {
-        ...dto,
+        usersId
       },
     });
     return dialog;
+  }
+  findById(id: string) {
+    return this.prisma.dialog.findUnique({
+      where: {
+        
+      }
+    })
   }
 }

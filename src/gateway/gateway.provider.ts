@@ -18,6 +18,7 @@ import { WsExceptionFilter } from 'src/dialog/wsException.filter';
 import { CreateMessageDto } from 'src/message/dto/create-message.dto';
 import { MessageService } from 'src/message/message.service';
 import { PrismaService } from 'src/prisma/prisma.service';
+import { UsersRepositoryService } from 'src/repositories/usersRepository/usersRepository.service';
 
 enum EventType {
   NEW_MESSAGE = "newMessage"
@@ -27,7 +28,7 @@ enum EventType {
 export class GatewayProvider implements OnModuleInit {
   constructor(
     private readonly dialogService: DialogService,
-    private readonly prisma: PrismaService,
+    private readonly usersRepository: UsersRepositoryService,
     private readonly messageService: MessageService,
   ) {}
   @WebSocketServer()
@@ -35,43 +36,41 @@ export class GatewayProvider implements OnModuleInit {
 
   onModuleInit() {
     this.server.on('connection', socket => {
-      const room = socket.request.headers.rooms;
-      socket.join(room);
+      const rooms = socket.request.headers.rooms;
+      socket.join(rooms);
     });
-  }
-
-  @SubscribeMessage('newMessage')
-  handler(@MessageBody() body: any, @ConnectedSocket() client: Socket) {
-    console.log(client.request.headers.rooms);
-  }
-
-  sendMessage(body: string) {
-    this.server.to('1337').emit('newMessage', body);
   }
 
   @UseFilters(WsExceptionFilter)
   @UsePipes(ValidationPipe)
-  @SubscribeMessage('create-dialog')
+  @SubscribeMessage('start-dialog')
   async createDialog(
     @MessageBody() body: CreateDialogDto,
     @ConnectedSocket() client: Socket,
   ) {
-    const dialog = await this.dialogService.createDialog(body);
-    client.emit('newMessage', dialog);
+    const {text, usersId, authorId} = body
+    const dialog = await this.dialogService.createDialog(usersId);
+    const dtoMessage: CreateMessageDto = {
+      dialogId: dialog.id,
+      authorId,
+      text
+    }
+    const message = this.messageService.createMessage(dtoMessage)
   }
 
   @UseFilters(WsExceptionFilter)
   @UsePipes(ValidationPipe)
-  @SubscribeMessage('create-message')
+  @SubscribeMessage('newMessage')
   async createMessage(
     @MessageBody() body: CreateMessageDto,
     @ConnectedSocket() client: Socket,
   ) {
-    await this.messageService.createMessage(body);
-    this.server.to(body.dialogId.toString()).emit('newMessage', body);
+    const message = await this.messageService.createMessage(body);
+    this.server.to(body.dialogId).emit('newMessage', message);
   }
 
-  notification(usersArray: number[], event: EventType) {
+  async createNoticeEvent(userId: number) {
+    const user = await this.usersRepository.findById(userId)
     
   }
 }

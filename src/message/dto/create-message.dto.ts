@@ -10,6 +10,6 @@ export class CreateMessageDto {
   text: string
 
   @IsNotEmpty()
-  @IsNumber()
-  dialogId: number
+  @IsString()
+  dialogId: string
 }

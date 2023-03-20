@@ -81,9 +81,4 @@ export class PostController {
     };
     return this.postService.editPostById(dto);
   }
-
-  @Get('check')
-  check() {
-    this.gateway.sendMessage('123456')
-  }
 }

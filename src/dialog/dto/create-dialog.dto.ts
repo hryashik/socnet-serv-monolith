@@ -5,4 +5,12 @@ export class CreateDialogDto {
   @IsNotEmpty()
   @IsNumber({}, { each: true })
   usersId: number[];
+
+  @IsNotEmpty()
+  @IsString()
+  text: string
+
+  @IsNotEmpty()
+  @IsNumber()
+  authorId: number
 }
