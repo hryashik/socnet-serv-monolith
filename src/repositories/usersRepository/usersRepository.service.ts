@@ -16,6 +16,7 @@ export class UsersRepositoryService {
         email: true,
         createdAt: true,
         updatedAt: true,
+        id: true
       },
     });
   }

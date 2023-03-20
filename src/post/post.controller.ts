@@ -10,11 +10,14 @@ import {
   Patch,
   Post,
   Req,
+  UseGuards,
   ValidationPipe,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import { IAuthorizedRequest } from 'src/auth/interfaces/authorized-request.interface';
 import { GatewayProvider } from 'src/gateway/gateway.provider';
-import { Authorization } from 'src/services/decorators/auth.decorator';
+import { Authorization } from 'src/services/decorators/auth.decorator';import { JwtAuthGuard } from 'src/services/guards/jwt-auth.guard';
+;
 import { CreatePostBody } from './dto/create-post-body';
 import { CreatePostDto } from './dto/create-post.dto';
 import { DeletePostById } from './dto/delete-post-byid.dto';
@@ -23,6 +26,7 @@ import { EditPostByIdDto } from './dto/edit-post-byid.dto';
 import { GetAllPostsByIdDto } from './dto/get-all-posts-byid.dto';
 import { PostService } from './post.service';
 
+@UseGuards(JwtAuthGuard)
 @Controller('post')
 export class PostController {
   constructor(private readonly postService: PostService, private readonly gateway: GatewayProvider) {}
@@ -43,10 +47,10 @@ export class PostController {
   @Authorization(true)
   @Get()
   getAllPostsById(@Req() request: IAuthorizedRequest) {
-    const dto: GetAllPostsByIdDto = {
-      userId: request.user.id,
-    };
-    return this.postService.getAllPostsById(dto);
+      const dto: GetAllPostsByIdDto = {
+        userId: request.user.id,
+      };
+      return this.postService.getAllPostsById(dto);
   }
 
   @Authorization(true)

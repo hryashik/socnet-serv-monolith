@@ -4,12 +4,11 @@ import { CreatePostDto } from './dto/create-post.dto';
 import { DeletePostById } from './dto/delete-post-byid.dto';
 import { EditPostByIdDto } from './dto/edit-post-byid.dto';
 import { GetAllPostsByIdDto } from './dto/get-all-posts-byid.dto';
+import { PostModel } from 'src/repositories/postsRepository/postsRepository.service';
 
 @Injectable()
 export class PostService {
-  constructor(
-    private readonly postsRepository: PostsRepositoryService,
-  ) {}
+  constructor(private readonly postsRepository: PostsRepositoryService) {}
 
   async createPost(dto: CreatePostDto) {
     try {
@@ -33,7 +32,7 @@ export class PostService {
   async deletePostById(dto: DeletePostById) {
     try {
       const posts = await this.postsRepository.findManyById(dto.userId);
-      if (posts.length && posts.find(el => el.id === dto.id)) {
+      if (posts.length && posts.find((el: PostModel) => el.id === dto.id)) {
         await this.postsRepository.deleteById(dto.id);
       } else {
         throw new Error('Incorrect id or userId');
@@ -46,8 +45,10 @@ export class PostService {
   async editPostById(dto: EditPostByIdDto) {
     try {
       const userPosts = await this.postsRepository.findManyById(dto.userId);
-      if (userPosts.length && userPosts.find(el => el.id === dto.id)) {
-        const post = await this.postsRepository.updateById(dto.id, dto.text)
+      if (
+        userPosts.find((el: PostModel) => el.id === dto.id)
+      ) {
+        const post = await this.postsRepository.updateById(dto.id, dto.text);
         return post;
       } else {
         throw new ForbiddenException('Incorrect credentials');

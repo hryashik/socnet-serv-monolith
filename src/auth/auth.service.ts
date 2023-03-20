@@ -5,6 +5,7 @@ import * as argon from 'argon2';
 import { JwtService } from '@nestjs/jwt';
 import { LoginDto } from './interfaces/dto/login.dto';
 import { UsersRepositoryService } from 'src/repositories/usersRepository/usersRepository.service';
+import { User } from '@prisma/client';
 
 @Injectable()
 export class AuthService {
@@ -18,7 +19,7 @@ export class AuthService {
     try {
       const hash = await this.hashPassword(dto.password);
       const newUser = await this.usersRepository.create(dto.email, hash)
-      return this.signToken(newUser.email);
+      return this.signToken(newUser.email, newUser.id);
     } catch (error) {
       //P2002 - prisma error if unique field is taken
       if (error.code === 'P2002')
@@ -34,7 +35,7 @@ export class AuthService {
       if (!user || !verifiedPassword) {
         throw Error
       }
-      return this.signToken(user.email);
+      return this.signToken(user.email, user.id);
     } catch (error) {
       throw new ForbiddenException('incorrect credentials');
     }
@@ -47,8 +48,8 @@ export class AuthService {
     return hash;
   }
 
-  private signToken(email: string) {
-    const token = this.jwtService.sign({ email });
+  private signToken(email: string, id: number) {
+    const token = this.jwtService.sign({ email: email, sub: id });
     return {
       access_token: token,
     };
@@ -60,5 +61,8 @@ export class AuthService {
     // @ts-ignore
     const { email } = this.jwtService.decode(parseToken);
     return email;
+  }
+  async findByEmail(email: string): Promise<User | undefined> {
+    return this.usersRepository.findByEmail(email)
   }
 }
