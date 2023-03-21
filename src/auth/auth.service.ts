@@ -31,7 +31,7 @@ export class AuthService {
   async login(dto: LoginDto) {
     try {
       const user = await this.usersRepository.findByEmail(dto.email)
-      const verifiedPassword = argon.verify(user.hash, dto.password);
+      const verifiedPassword = await argon.verify(user.hash, dto.password);
       if (!user || !verifiedPassword) {
         throw Error
       }
