@@ -12,6 +12,9 @@ model User {
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
   email        String    @unique
+  firstName    String?
+  secondName   String?
+  displayName  String?
   hash         String
   avatar       String?
   noticeRoomId String    @default(uuid())
@@ -35,7 +38,7 @@ model Post {
 }
 
 model Dialog {
-  id      String       @id @default(uuid())
+  id      String    @id @default(uuid())
   usersId Int[]
   users   User[]
   Message Message[]

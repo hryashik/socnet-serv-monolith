@@ -11,7 +11,6 @@ import { User } from '@prisma/client';
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly prismaService: PrismaService,
     private readonly usersRepository: UsersRepositoryService,
   ) {}
 
@@ -55,14 +54,7 @@ export class AuthService {
     };
   }
 
-  public decodeToken(token: string) {
-    const parseToken = token.split('Bearer ')[1];
-    /* console.log(this.jwtService.verify(token)) */
-    // @ts-ignore
-    const { email } = this.jwtService.decode(parseToken);
-    return email;
-  }
-  async findByEmail(email: string): Promise<User | undefined> {
+  async findByEmail(email: string): Promise<User| undefined> {
     return this.usersRepository.findByEmail(email)
   }
 }

@@ -7,6 +7,7 @@ import { DialogModule } from './dialog/dialog.module';
 import { MessageModule } from './message/message.module';
 import { UsersRepositoryModule } from './repositories/usersRepository/usersRepository.module';
 import { ConfigModule } from '@nestjs/config';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { ConfigModule } from '@nestjs/config';
     UsersRepositoryModule,
     ConfigModule.forRoot({
       isGlobal: true
-    })
+    }),
+    UsersModule
   ],
 })
 export class AppModule {}

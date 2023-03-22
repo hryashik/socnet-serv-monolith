@@ -6,21 +6,15 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export class UsersRepositoryService {
   constructor(private readonly prisma: PrismaService) {}
 
-  create(email: string, hash: string) {
+  async create(email: string, hash: string): Promise<User | undefined> {
     return this.prisma.user.create({
       data: {
         email,
         hash,
-      },
-      select: {
-        email: true,
-        createdAt: true,
-        updatedAt: true,
-        id: true,
+        displayName: email.split('@')[0],
       },
     });
   }
-
   async findByEmail(email: string): Promise<User | undefined> {
     return this.prisma.user.findUnique({
       where: {
@@ -28,11 +22,11 @@ export class UsersRepositoryService {
       },
     });
   }
-  async findById(id: number) {
+  async findById(id: number): Promise<User | undefined> {
     return this.prisma.user.findUnique({
       where: {
-        id
-      }
-    })
+        id,
+      },
+    });
   }
 }
