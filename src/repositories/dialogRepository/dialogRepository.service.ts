@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Dialog } from '@prisma/client';
 import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
@@ -12,11 +13,14 @@ export class DialogRepositoryService {
     });
     return dialog;
   }
-  findById(id: string) {
+  async findById(id: string): Promise<Dialog | undefined> {
     return this.prisma.dialog.findUnique({
       where: {
         id,
       },
+      include: {
+        Messages: true,
+      }
     });
   }
   async findAll(id: number) {
@@ -27,7 +31,11 @@ export class DialogRepositoryService {
         },
       },
       include: {
-        Messages: true,
+        Messages: {
+          include: {
+            author: true,
+          }
+        }
       }
     })
   }

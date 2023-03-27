@@ -38,9 +38,9 @@ model Post {
 }
 
 model Dialog {
-  id      String    @id @default(uuid())
-  usersId Int[]     
-  users   User[]
+  id       String    @id @default(uuid())
+  usersId  Int[]
+  users    User[]    
   Messages Message[]
 }
 

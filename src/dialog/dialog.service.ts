@@ -29,6 +29,25 @@ export class DialogService {
     }
   }
   async getAllDialogsById(id: number) {
-    return this.dialogRepository.findAll(id);
+    const dialogs = await this.dialogRepository.findAll(id);
+    dialogs.forEach(el => {
+      el.Messages.forEach(mess => {
+        delete mess.author.hash
+        delete mess.author.noticeRoomId
+      })
+    })
+    return dialogs
+  }
+  async getDialogById({userId, dialogId}: {userId: number, dialogId: string}) {
+    try {
+      const dialog = await this.dialogRepository.findById(dialogId)
+      console.log(dialog.usersId.find(el => el === userId), `userId: ${userId}`)
+      if (!dialog || !dialog.usersId.find(el => el === userId)) {
+        throw new Error()
+      }
+      return dialog
+    } catch (error) {
+      throw new ForbiddenException('Incorrect data')
+    }
   }
 }

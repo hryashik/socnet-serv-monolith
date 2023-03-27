@@ -1,14 +1,22 @@
-import { Body, Controller, Get, Post, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { IAuthorizedRequest } from 'src/auth/interfaces/authorized-request.interface';
 import { JwtAuthGuard } from 'src/services/guards/jwt-auth.guard';
 import { DialogService } from './dialog.service';
 import { CreateDialogDto } from './dto/create-dialog.dto';
 
 @UseGuards(JwtAuthGuard)
-@Controller('dialog')
+@Controller('dialogs')
 export class DialogController {
   constructor(private readonly dialogService: DialogService) {}
-  @Post()
+  /* @Post()
   createMessage(
     @Query('dialog') dialogId: string,
     @Body() body: {text: string},
@@ -19,7 +27,7 @@ export class DialogController {
         text: body.text,
         userId: req.user.id
       }
-  }
+  } */
   @Post('create')
   startDialog(
     @Req() req: IAuthorizedRequest,
@@ -27,9 +35,15 @@ export class DialogController {
   ) {
     return this.dialogService.startDialog({ ...dto, authorId: req.user.id });
   }
-  
+
   @Get()
-  getAllDialogs(@Req() req: IAuthorizedRequest) {
+  getAllDialogs(
+    @Req() req: IAuthorizedRequest,
+    @Query('id') dialogId: string,
+  ) {
+    if (dialogId) {
+      return this.dialogService.getDialogById({userId: req.user.id, dialogId})
+    }
     return this.dialogService.getAllDialogsById(req.user.id);
   }
 }
