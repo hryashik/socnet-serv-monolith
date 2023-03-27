@@ -24,10 +24,10 @@ export class DialogRepositoryService {
       where: {
         usersId: {
           has: id
-        }
+        },
       },
       include: {
-        Message: true
+        Messages: true,
       }
     })
   }

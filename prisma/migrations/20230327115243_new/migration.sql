@@ -4,8 +4,12 @@ CREATE TABLE "users" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "email" TEXT NOT NULL,
+    "firstName" TEXT,
+    "secondName" TEXT,
+    "displayName" TEXT,
     "hash" TEXT NOT NULL,
     "avatar" TEXT,
+    "noticeRoomId" TEXT NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -24,7 +28,7 @@ CREATE TABLE "posts" (
 
 -- CreateTable
 CREATE TABLE "Dialog" (
-    "id" SERIAL NOT NULL,
+    "id" TEXT NOT NULL,
     "usersId" INTEGER[],
 
     CONSTRAINT "Dialog_pkey" PRIMARY KEY ("id")
@@ -35,7 +39,7 @@ CREATE TABLE "Message" (
     "id" SERIAL NOT NULL,
     "authorId" INTEGER NOT NULL,
     "text" TEXT NOT NULL,
-    "dialogId" INTEGER NOT NULL,
+    "dialogId" TEXT NOT NULL,
     "isRead" BOOLEAN NOT NULL DEFAULT false,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -44,7 +48,7 @@ CREATE TABLE "Message" (
 
 -- CreateTable
 CREATE TABLE "_DialogToUser" (
-    "A" INTEGER NOT NULL,
+    "A" TEXT NOT NULL,
     "B" INTEGER NOT NULL
 );
 

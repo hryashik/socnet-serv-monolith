@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { DialogRepositoryService } from 'src/repositories/dialogRepository/dialogRepository.service';
 import { CreateMessageDto } from 'src/repositories/messagesRepository/dto/create-message.dto';
@@ -13,15 +13,22 @@ export class DialogService {
     private readonly messagesRepository: MessagesRepositoryService,
   ) {}
   async startDialog(dto: CreateDialogDto) {
-    const dialog = await this.dialogRepository.create(dto.usersId);
-    const messageDto: CreateMessageDto = {
-      authorId: dto.authorId,
-      text: dto.text,
-      dialogId: dialog.id
+    try {
+      if (!dto.usersId.find(el => el === dto.authorId)) {
+        throw new Error()
+      }
+      const dialog = await this.dialogRepository.create(dto.usersId);
+      const messageDto: CreateMessageDto = {
+        authorId: dto.authorId,
+        text: dto.text,
+        dialogId: dialog.id,
+      };
+      return this.messagesRepository.create(messageDto);
+    } catch (error) {
+      throw new ForbiddenException('Incorrect credentials')
     }
-    const message = this.messagesRepository.create(messageDto)
   }
   async getAllDialogsById(id: number) {
-    return this.dialogRepository.findAll(id)
+    return this.dialogRepository.findAll(id);
   }
 }
