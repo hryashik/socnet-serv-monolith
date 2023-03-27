@@ -15,8 +15,6 @@ import { Server, Socket } from 'socket.io';
 import { DialogService } from 'src/dialog/dialog.service';
 import { CreateDialogDto } from 'src/dialog/dto/create-dialog.dto';
 import { WsExceptionFilter } from 'src/dialog/wsException.filter';
-import { CreateMessageDto } from 'src/message/dto/create-message.dto';
-import { MessageService } from 'src/message/message.service';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersRepositoryService } from 'src/repositories/usersRepository/usersRepository.service';
 
@@ -29,7 +27,6 @@ export class GatewayProvider implements OnModuleInit {
   constructor(
     private readonly dialogService: DialogService,
     private readonly usersRepository: UsersRepositoryService,
-    private readonly messageService: MessageService,
   ) {}
   @WebSocketServer()
   server: Server;
@@ -41,7 +38,7 @@ export class GatewayProvider implements OnModuleInit {
     });
   }
 
-  @UseFilters(WsExceptionFilter)
+  /* @UseFilters(WsExceptionFilter)
   @UsePipes(ValidationPipe)
   @SubscribeMessage('start-dialog')
   async createDialog(
@@ -58,6 +55,16 @@ export class GatewayProvider implements OnModuleInit {
     const message = this.messageService.createMessage(dtoMessage)
   }
 
+  @SubscribeMessage('get-dialog')
+  async check(
+    @MessageBody() body: {id: string},
+    @ConnectedSocket() client: Socket,
+  ) {
+    const dialog = await this.dialogService.findById(body.id)
+    console.log(dialog)
+    client.send('newMessage', dialog)
+  }
+
   @UseFilters(WsExceptionFilter)
   @UsePipes(ValidationPipe)
   @SubscribeMessage('newMessage')
@@ -72,5 +79,5 @@ export class GatewayProvider implements OnModuleInit {
   async createNoticeEvent(userId: number) {
     const user = await this.usersRepository.findById(userId)
     
-  }
+  } */
 }

@@ -4,7 +4,6 @@ import { PrismaModule } from './prisma/prisma.module';
 import { PostModule } from './post/post.module';
 import { GatewayModule } from './gateway/gateway.module';
 import { DialogModule } from './dialog/dialog.module';
-import { MessageModule } from './message/message.module';
 import { UsersRepositoryModule } from './repositories/usersRepository/usersRepository.module';
 import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
@@ -16,7 +15,6 @@ import { UsersModule } from './users/users.module';
     PostModule,
     GatewayModule,
     DialogModule,
-    MessageModule,
     UsersRepositoryModule,
     ConfigModule.forRoot({
       isGlobal: true
