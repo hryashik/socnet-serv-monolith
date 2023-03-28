@@ -16,18 +16,19 @@ import { CreateDialogDto } from './dto/create-dialog.dto';
 @Controller('dialogs')
 export class DialogController {
   constructor(private readonly dialogService: DialogService) {}
-  /* @Post()
+  @Post()
   createMessage(
-    @Query('dialog') dialogId: string,
-    @Body() body: {text: string},
-    @Req() req: IAuthorizedRequest
-    ) {
-      return {
-        dialogId,
-        text: body.text,
-        userId: req.user.id
-      }
-  } */
+    @Query('id') dialogId: string,
+    @Body() body: { text: string },
+    @Req() req: IAuthorizedRequest,
+  ) {
+    const dto = {
+      authorId: req.user.id,
+      text: body.text,
+      dialogId
+    }
+    return this.dialogService.addMessage(dto);
+  }
   @Post('create')
   startDialog(
     @Req() req: IAuthorizedRequest,
@@ -37,12 +38,12 @@ export class DialogController {
   }
 
   @Get()
-  getAllDialogs(
-    @Req() req: IAuthorizedRequest,
-    @Query('id') dialogId: string,
-  ) {
+  getAllDialogs(@Req() req: IAuthorizedRequest, @Query('id') dialogId: string) {
     if (dialogId) {
-      return this.dialogService.getDialogById({userId: req.user.id, dialogId})
+      return this.dialogService.getDialogById({
+        userId: req.user.id,
+        dialogId,
+      });
     }
     return this.dialogService.getAllDialogsById(req.user.id);
   }

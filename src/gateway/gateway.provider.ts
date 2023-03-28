@@ -1,9 +1,11 @@
 import {
   OnModuleInit,
   UseFilters,
+  UseGuards,
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
+import { AuthGuard } from '@nestjs/passport';
 import {
   ConnectedSocket,
   MessageBody,
@@ -17,12 +19,20 @@ import { CreateDialogDto } from 'src/dialog/dto/create-dialog.dto';
 import { WsExceptionFilter } from 'src/dialog/wsException.filter';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersRepositoryService } from 'src/repositories/usersRepository/usersRepository.service';
+import { JwtAuthGuard } from 'src/services/guards/jwt-auth.guard';
 
 enum EventType {
-  NEW_MESSAGE = "newMessage"
+  NEW_MESSAGE = 'newMessage',
 }
 
-@WebSocketGateway()
+@WebSocketGateway({
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  },
+})
 export class GatewayProvider implements OnModuleInit {
   constructor(
     private readonly dialogService: DialogService,
@@ -33,9 +43,14 @@ export class GatewayProvider implements OnModuleInit {
 
   onModuleInit() {
     this.server.on('connection', socket => {
-      const rooms = socket.request.headers.rooms;
-      socket.join(rooms);
+      /* console.log(socket.handshake); */
     });
+  }
+  @UseFilters(WsExceptionFilter)
+  /* @UseGuards(AuthGuard('jwtws')) */
+  @SubscribeMessage('newMessage')
+  handler(@MessageBody() body, @ConnectedSocket() client: Socket) {
+    console.log(client.request)
   }
 
   /* @UseFilters(WsExceptionFilter)

@@ -7,9 +7,7 @@ export class MessagesRepositoryService {
   constructor(private readonly prisma: PrismaService) {}
   create(dto: CreateMessageDto) {
     return this.prisma.message.create({
-      data: {
-        ...dto,
-      },
+      data: dto
     });
   }
 }
