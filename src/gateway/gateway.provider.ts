@@ -16,7 +16,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import { DialogService } from 'src/dialog/dialog.service';
 import { CreateDialogDto } from 'src/dialog/dto/create-dialog.dto';
-import { WsExceptionFilter } from 'src/dialog/wsException.filter';
+import { WsExceptionFilter } from 'src/gateway/wsException.filter';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UsersRepositoryService } from 'src/repositories/usersRepository/usersRepository.service';
 import { JwtAuthGuard } from 'src/services/guards/jwt-auth.guard';
@@ -47,10 +47,10 @@ export class GatewayProvider implements OnModuleInit {
     });
   }
   @UseFilters(WsExceptionFilter)
-  /* @UseGuards(AuthGuard('jwtws')) */
+  @UseGuards(AuthGuard('jwtws'))
   @SubscribeMessage('newMessage')
   handler(@MessageBody() body, @ConnectedSocket() client: Socket) {
-    console.log(client.request)
+    console.log(client.handshake.headers)
   }
 
   /* @UseFilters(WsExceptionFilter)

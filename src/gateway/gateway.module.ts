@@ -1,12 +1,12 @@
 import { Global, Module } from '@nestjs/common';
+import { AuthModule } from 'src/auth/auth.module';
 import { JwtWsStrategy } from 'src/auth/strategies/jwt-ws-strategy';
 import { DialogModule } from 'src/dialog/dialog.module';
-import { DialogService } from 'src/dialog/dialog.service';
 import { GatewayProvider } from './gateway.provider';
 
 @Global()
 @Module({
-  imports: [DialogModule],
+  imports: [DialogModule, AuthModule],
   providers: [GatewayProvider, JwtWsStrategy],
   exports: [GatewayProvider],
 })

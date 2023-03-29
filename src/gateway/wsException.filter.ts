@@ -15,7 +15,7 @@ export class WsExceptionFilter {
       client.emit('error', 'incorrect data')
     } else {
       // handle websocket exception
-      client.emit('newMessage', 'incorrect data')
+      client.disconnect()
     }
   }
 }
